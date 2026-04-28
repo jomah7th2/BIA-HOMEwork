@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}User #{{ data.user.user_id }} — GA Recommendations{% endblock %}
+
+{% block content %}
+
+{# ============================================================
+   ROW 1: User card + GA run summary
+   ============================================================ #}
+<div class="grid lg:grid-cols-3 gap-4 mb-5">
+
+    {# -- User card -- #}
+    <div class="glass-card rounded-2xl p-5">
+        <p class="text-xs text-slate-400 uppercase tracking-widest mb-2">Active User</p>
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 grid place-items-center text-lg font-bold">
+                {{ data.user.user_id }}
+            </div>
+            <div>
+                <p class="font-semibold text-lg">User #{{ data.user.user_id }}</p>
+                <p class="text-sm text-slate-400">{{ data.user.country }}</p>
+            </div>
+        </div>
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+                <span class="text-slate-400">Age</span>
+                <span>{{ data.user.age }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-slate-400">Interactions</span>
+                <span class="text-indigo-300 font-medium">{{ data.seen_count }} products</span>
+            </div>
+        </div>
+    </div>
+
+    {# -- GA Run Summary -- #}
+    <div class="glass-card rounded-2xl p-5 lg:col-span-2">
+        <p class="text-xs text-slate-400 uppercase tracking-widest mb-3">Genetic Algorithm Run — ETagMF Method</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+            <div class="rounded-xl bg-slate-800/60 border border-slate-700/60 p-3 text-center">
+                <p class="text-2xl font-bold text-indigo-300">{{ data.ga_stats.population_size }}</p>
+                <p class="text-xs text-slate-400 mt-1">Population (Np)</p>
+            </div>
+            <div class="rounded-xl bg-slate-800/60 border border-slate-700/60 p-3 text-center">
+                <p class="text-2xl font-bold text-indigo-300">{{ data.ga_stats.generations }}</p>
+                <p class="text-xs text-slate-400 mt-1">Generations (Ni)</p>
+            </div>
+            <div class="rounded-xl bg-slate-800/60 border border-slate-700/60 p-3 text-center">
+                <p class="text-2xl font-bold text-purple-300">{{ data.ga_stats.crossover_prob }}</p>
+                <p class="text-xs text-slate-400 mt-1">Crossover (Pc)</p>
+            </div>
+            <div class="rounded-xl bg-slate-800/60 border border-slate-700/60 p-3 text-center">
+                <p class="text-2xl font-bold text-purple-300">{{ data.ga_stats.mutation_prob }}</p>
+                <p class="text-xs text-slate-400 mt-1">Mutation (Pm)</p>
+            </div>
+        </div>
+
+        {# RMSE improvement strip #}
+        <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-sm">
+                <span class="text-slate-400">Initial RMSE:</span>
+                <span class="font-semibold text-red-300">{{ data.ga_stats.initial_rmse }}</span>
+            </div>
+            <svg class="w-5 h-5 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-sm">
+                <span class="text-slate-400">Final RMSE:</span>
+                <span class="font-semibold text-emerald-300">{{ data.ga_stats.final_rmse }}</span>
+            </div>
+            <div class="ml-auto px-3 py-2 rounded-lg bg-indigo-500/20 border border-indigo-400/30 text-sm">
+                <span class="text-slate-300">Best gen: </span>
+                <span class="font-semibold text-indigo-300">#{{ data.ga_stats.best_generation }}</span>
+                <span class="mx-2 text-slate-600">|</span>
+                <span class="font-semibold text-emerald-300">↓ {{ data.ga_stats.improvement_pct }}% RMSE</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ============================================================
+   ROW 2: RMSE Evolution chart + Chromosome weights
+   ============================================================ #}
+<div class="grid lg:grid-cols-2 gap-4 mb-5">
+
+    {# -- RMSE evolution chart -- #}
+    <div class="glass-card rounded-2xl p-5">
+        <p class="text-sm font-medium mb-1">RMSE Evolution per Generation</p>
+        <p class="text-xs text-slate-400 mb-4">GA minimises prediction error — lower curve = better chromosome.</p>
+        <div class="relative h-44">
+            <canvas id="rmseChart"></canvas>
+        </div>
+    </div>
+
+    {# -- Chromosome weights (learned category affinities) -- #}
+    <div class="glass-card rounded-2xl p-5">
+        <p class="text-sm font-medium mb-1">Chromosome — Learned Feature Weights</p>
+        <p class="text-xs text-slate-400 mb-4">
+            Each gene = one product feature. Higher weight → stronger user affinity.
+        </p>
+        <div class="space-y-2 overflow-y-auto max-h-44 pr-1">
+            {% for cat, w in data.top_categories %}
+            {% set pct = (w * 100) | int %}
+            <div>
+                <div class="flex justify-between text-xs mb-1">
+                    <span class="text-slate-300">{{ cat }}</span>
+                    <span class="text-indigo-300 font-medium">{{ "%.3f"|format(w) }}</span>
+                </div>
+                <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all"
+                         style="width: {{ pct }}%"></div>
+                </div>
+            </div>
+            {% endfor %}
+            {# price gene #}
+            {% set pw = data.chromosome_weights.get('price_scaled', 0) %}
+            {% set ppct = (pw * 100) | int %}
+            <div>
+                <div class="flex justify-between text-xs mb-1">
+                    <span class="text-slate-300">Price Sensitivity</span>
+                    <span class="text-emerald-300 font-medium">{{ "%.3f"|format(pw) }}</span>
+                </div>
+                <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all"
+                         style="width: {{ ppct }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ============================================================
+   ROW 3: Controls
+   ============================================================ #}
+<div class="glass-card rounded-2xl px-5 py-4 mb-5">
+    <form method="get" class="flex flex-wrap items-end gap-3">
+        <div>
+            <label class="block text-xs text-slate-400 mb-1.5">Number of recommendations</label>
+            <input
+                type="number" min="4" max="30" name="top_n" value="{{ top_n }}"
+                class="w-28 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+        </div>
+        <button class="px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-sm text-white font-medium transition">
+            Re-run GA
+        </button>
+        <a href="{{ url_for('home') }}" class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-sm text-white transition">
+            ← All Users
+        </a>
+        <span class="ml-auto text-xs text-slate-500">Showing {{ data.recommendations|length }} unseen recommendations</span>
+    </form>
+</div>
+
+{# ============================================================
+   ROW 4: Recommendation cards
+   ============================================================ #}
+<div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
+    {% for item in data.recommendations %}
+
+    {# Score color: high/med/low #}
+    {% if item.score >= 0.65 %}
+        {% set score_cls = "bg-emerald-500/20 text-emerald-300 border-emerald-400/30" %}
+        {% set bar_cls   = "bg-gradient-to-r from-emerald-500 to-teal-400" %}
+    {% elif item.score >= 0.40 %}
+        {% set score_cls = "bg-yellow-500/20 text-yellow-300 border-yellow-400/30" %}
+        {% set bar_cls   = "bg-gradient-to-r from-yellow-500 to-amber-400" %}
+    {% else %}
+        {% set score_cls = "bg-slate-600/30 text-slate-300 border-slate-500/30" %}
+        {% set bar_cls   = "bg-slate-500" %}
+    {% endif %}
+
+    <article class="glass-card rounded-2xl p-5 border border-slate-800 flex flex-col gap-3">
+
+        {# Header row #}
+        <div class="flex items-start justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-slate-500 font-mono">#{{ item.rank }}</span>
+                <div>
+                    <p class="text-xs text-slate-400">Product</p>
+                    <p class="font-semibold">P-{{ item.product_id }}</p>
+                </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-xs font-bold border {{ score_cls }} shrink-0">
+                {{ "%.1f"|format(item.score * 100) }}%
+            </span>
+        </div>
+
+        {# Score bar #}
+        <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+            <div class="{{ bar_cls }} h-full rounded-full" style="width: {{ (item.score * 100)|int }}%"></div>
+        </div>
+
+        {# Product details #}
+        <div class="grid grid-cols-2 gap-y-1 text-sm">
+            <span class="text-slate-400">Category</span>
+            <span class="font-medium">{{ item.category }}</span>
+            <span class="text-slate-400">Price</span>
+            <span class="font-medium">EUR {{ "%.2f"|format(item.price) }}</span>
+            <span class="text-slate-400">GA cat. weight</span>
+            <span class="text-indigo-300 font-mono">{{ "%.3f"|format(item.category_weight) }}</span>
+            <span class="text-slate-400">Price weight</span>
+            <span class="text-emerald-300 font-mono">{{ "%.3f"|format(item.price_weight) }}</span>
+        </div>
+
+        {# Explanation #}
+        <p class="text-xs text-slate-400 leading-relaxed border-t border-slate-800 pt-2">
+            {{ item.reason }}
+        </p>
+    </article>
+    {% endfor %}
+</div>
+
+{# ============================================================
+   Chart.js — RMSE Evolution
+   ============================================================ #}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+    const history = {{ data.ga_stats.fitness_history | tojson }};
+    if (!history || history.length === 0) return;
+
+    const ctx = document.getElementById("rmseChart").getContext("2d");
+    new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: history.map((_, i) => i + 1),
+            datasets: [{
+                label: "Best RMSE",
+                data: history,
+                borderColor: "rgba(129,140,248,0.9)",
+                backgroundColor: "rgba(129,140,248,0.08)",
+                borderWidth: 2,
+                pointRadius: 0,
+                fill: true,
+                tension: 0.4,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 600 },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` RMSE: ${ctx.parsed.y.toFixed(5)}`
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: { display: true, text: "Generation", color: "#94a3b8", font: { size: 11 } },
+                    ticks: { color: "#64748b", maxTicksLimit: 10 },
+                    grid:  { color: "rgba(148,163,184,0.06)" }
+                },
+                y: {
+                    title: { display: true, text: "RMSE (lower = better)", color: "#94a3b8", font: { size: 11 } },
+                    ticks: { color: "#64748b" },
+                    grid:  { color: "rgba(148,163,184,0.06)" }
+                }
+            }
+        }
+    });
+})();
+</script>
+
+{% endblock %}

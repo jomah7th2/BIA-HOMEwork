@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Smart Recommendation Store{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body class="light-mode bg-slate-50 text-slate-800 min-h-screen">
+    <header class="border-b border-slate-200 bg-white/90 backdrop-blur sticky top-0 z-20">
+        <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-3">
+            <a href="{{ url_for('home') }}" class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-emerald-500 grid place-items-center text-sm font-bold">
+                    GA
+                </span>
+                <div>
+                    <p class="text-lg font-semibold tracking-tight leading-tight">Smart GA Store</p>
+                    <p class="text-xs text-slate-400 leading-tight">Simple and fast personalized recommendations</p>
+                </div>
+            </a>
+
+            <nav class="flex items-center gap-2">
+                <a
+                    href="{{ url_for('home') }}"
+                    class="px-3 py-2 rounded-lg text-sm transition {{ 'bg-indigo-500 text-white' if request.path == url_for('home') else 'text-slate-600 hover:bg-slate-100' }}"
+                >
+                    Home
+                </a>
+                <a
+                    href="{{ url_for('team') }}"
+                    class="px-3 py-2 rounded-lg text-sm transition {{ 'bg-indigo-500 text-white' if request.path == url_for('team') else 'text-slate-600 hover:bg-slate-100' }}"
+                >
+                    Team
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

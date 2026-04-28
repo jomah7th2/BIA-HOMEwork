@@ -1,0 +1,55 @@
+.light-mode {
+  background:
+    radial-gradient(1000px 550px at 0% -20%, rgba(99, 102, 241, 0.16), transparent 60%),
+    radial-gradient(900px 520px at 100% -20%, rgba(16, 185, 129, 0.14), transparent 62%),
+    #f8fafc;
+  color: #0f172a;
+}
+
+.light-mode .glass-card {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(248, 250, 252, 0.86));
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+/* Light mode utility overrides for templates that were originally dark themed */
+.light-mode .bg-slate-900,
+.light-mode .bg-slate-900\/70,
+.light-mode .bg-slate-900\/90 {
+  background-color: #ffffff !important;
+}
+
+.light-mode .bg-slate-800,
+.light-mode .bg-slate-800\/40,
+.light-mode .bg-slate-800\/60,
+.light-mode .bg-slate-800\/70 {
+  background-color: #f1f5f9 !important;
+}
+
+.light-mode .border-slate-800,
+.light-mode .border-slate-800\/80,
+.light-mode .border-slate-700,
+.light-mode .border-slate-700\/60,
+.light-mode .border-slate-700\/70 {
+  border-color: #cbd5e1 !important;
+}
+
+.light-mode .text-slate-100 {
+  color: #0f172a !important;
+}
+
+.light-mode .text-slate-300 {
+  color: #334155 !important;
+}
+
+.light-mode .text-slate-400 {
+  color: #475569 !important;
+}
+
+.light-mode .text-slate-500 {
+  color: #64748b !important;
+}
+
+.light-mode .hover\:bg-slate-800:hover {
+  background-color: #e2e8f0 !important;
+}

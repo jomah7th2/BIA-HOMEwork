@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Choose User | Smart GA Store{% endblock %}
+
+{% block content %}
+<section class="mb-8">
+    <h1 class="text-3xl sm:text-4xl font-bold mb-3">Personalized Store Recommendations</h1>
+    <p class="text-slate-300 max-w-3xl">
+        Select a user to generate recommendations using a simple Genetic Algorithm model trained on ratings and behavior data.
+    </p>
+</section>
+
+<section class="glass-card p-5 sm:p-6 rounded-2xl">
+    <div class="flex items-center justify-between mb-5">
+        <h2 class="text-xl font-semibold">Users</h2>
+        <span class="text-sm text-slate-400">{{ users|length }} users loaded</span>
+    </div>
+
+    <div class="overflow-auto">
+        <table class="w-full text-left min-w-[700px]">
+            <thead>
+                <tr class="text-slate-300 border-b border-slate-700">
+                    <th class="py-3">User ID</th>
+                    <th class="py-3">Age</th>
+                    <th class="py-3">Country</th>
+                    <th class="py-3">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr class="border-b border-slate-800 hover:bg-slate-800/40 transition">
+                    <td class="py-3">{{ user.user_id }}</td>
+                    <td class="py-3">{{ user.age }}</td>
+                    <td class="py-3">{{ user.country }}</td>
+                    <td class="py-3">
+                        <a
+                            href="{{ url_for('user_recommendations', user_id=user.user_id) }}"
+                            class="inline-flex items-center px-3 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-medium transition"
+                        >
+                            View Recommendations
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

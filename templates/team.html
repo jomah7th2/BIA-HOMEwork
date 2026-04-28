@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Team | Smart GA Store{% endblock %}
+
+{% block content %}
+<section class="glass-card rounded-3xl p-6 sm:p-8 mb-6 relative overflow-hidden">
+    <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-indigo-500/20 blur-2xl"></div>
+    <div class="absolute -bottom-12 -left-12 w-44 h-44 rounded-full bg-emerald-500/20 blur-2xl"></div>
+
+    <div class="relative z-10">
+        <span class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-semibold tracking-wide">
+            OUR TEAM
+        </span>
+        <h1 class="text-3xl sm:text-4xl font-bold mt-3 mb-3">Project Team</h1>
+        <p class="text-slate-300 max-w-3xl leading-relaxed">
+            Meet the team behind the intelligent recommendation system. Each member contributed to designing, implementing, and improving the GA-powered shopping experience.
+        </p>
+    </div>
+</section>
+
+<section class="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
+    {% for member in team_members %}
+    <article class="glass-card rounded-2xl p-5 border border-slate-800 hover:border-indigo-400/30 hover:-translate-y-1 transition duration-300">
+        <div class="flex items-start justify-between gap-3 mb-4">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 grid place-items-center text-sm font-bold shrink-0">
+                    {{ loop.index }}
+                </div>
+                <div class="min-w-0">
+                    <p class="text-xs uppercase tracking-widest text-slate-400 mb-1">Team Member</p>
+                    <h2 class="text-lg font-semibold leading-tight break-words">{{ member.name }}</h2>
+                </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-400/30">
+                {{ member.section }}
+            </span>
+        </div>
+
+        <div class="rounded-xl bg-slate-800/60 border border-slate-700/70 px-3 py-2.5 mb-3">
+            <p class="text-xs text-slate-400 mb-1">Username</p>
+            <p class="font-mono text-sm text-indigo-300 break-all">{{ member.username }}</p>
+        </div>
+
+        <div class="rounded-xl bg-slate-900/70 border border-slate-800 px-3 py-3 mb-3">
+            <p class="text-xs text-slate-400 mb-1">Role</p>
+            <p class="text-sm font-semibold text-slate-100">{{ member.role }}</p>
+        </div>
+
+        <div class="border-t border-slate-800 pt-3">
+            <p class="text-xs text-slate-400 mb-1.5">Contribution in this assignment</p>
+            <p class="text-sm leading-relaxed text-slate-300">{{ member.contribution }}</p>
+        </div>
+    </article>
+    {% endfor %}
+</section>
+{% endblock %}
